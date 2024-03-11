@@ -8,8 +8,8 @@ Before you start, make sure you have the following installed on your machine:
 •	Node.js and npm - You can download and install them from https://nodejs.org/
 Project Setup
 1.	Clone the Repository:
-git clone <repository-url>
-cd <project-folder>
+git clone (repository-url)
+cd (project-folder)
 2.	Install Dependencies:
 npm install.
 Running the Project
