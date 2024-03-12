@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function App() {
   const [title, setTitle] = useState('');
@@ -33,24 +37,39 @@ function App() {
 
   const generateReport = () => {
     const currentDate = new Date().toLocaleString();
-    let report = '';
-    if (properties.title) report += `Title: ${title}\n`;
-    if (properties.author) report += `Author: ${author}\n`;
-    if (properties.date) report += `Date: ${currentDate}\n`;
-    return report + '\n' + content;
+    const report = {
+      content: [
+        { text: 'Title:', style: 'header' },
+        { text: properties.title ? title : '', style: 'body' },
+        { text: 'Author:', style: 'header' },
+        { text: properties.author ? author : '', style: 'body' },
+        { text: 'Date:', style: 'header' },
+        { text: currentDate, style: 'body' },
+        { text: content, style: 'body' },
+      ],
+      styles: {
+        header: {
+          bold: true,
+        },
+        body: {
+          margin: [0, 10],
+        },
+      },
+    };
+    return pdfMake.createPdf(report);
   };
 
   const downloadReport = () => {
     const report = generateReport();
-    const blob = new Blob([report], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'report.txt');
-    document.body.appendChild(link);
-    link.click();
+    report.getBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'report.pdf');
+      document.body.appendChild(link);
+      link.click();
+    });
   };
-
   return (
     <div className="container-fluid p-5">
       <header className="text-center mb-5">
